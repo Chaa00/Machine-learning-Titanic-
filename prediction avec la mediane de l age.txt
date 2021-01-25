@@ -1,0 +1,171 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Jun 20 15:10:11 2020
+
+@author: HP-PC
+"""
+
+#prediction of survived using age median 
+
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+from  sklearn.model_selection  import cross_val_score
+
+Data=pd.read_csv(r"C:\Users\HP-PC\Desktop\train.csv",sep=',')
+test=pd.read_csv(r"C:\Users\HP-PC\Desktop\test.csv",sep=',')
+
+#je garde les memes changements sur les autres descripteurs sauf l'age je remplace
+#les valeurs NaN par la mediane 
+
+Data['Age']=Data['Age'].fillna(Data['Age'].median())
+test['Age']=test['Age'].fillna(test['Age'].median())
+Data["Age"] = Data["Age"].astype(int)
+print(Data['Age'])
+
+
+#le meme travail est maintenu dans cette partie sauf que l'age est changé par la médiane
+
+columns_cible=["Survived"]
+columns_Data=["Pclass","Sex", "Age", "SibSp", "Parch", "Fare",  "Embarked", "FamilySize" ,"Title"]
+
+
+
+X=Data[columns_Data]
+y=Data[columns_cible]
+
+X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2,random_state=0)
+
+
+
+    from sklearn.ensemble import RandomForestClassifier
+
+    forest=RandomForestClassifier(n_estimators=100,criterion='entropy',random_state=0)
+    forest.fit(X_train, y_train)
+    forest_predictions = forest.predict (X_test)
+    accuracy_score(y_test, forest_predictions)
+    confusion_matrix (y_test, forest_predictions)
+    print(classification_report(y_test,forest_predictions)) 
+    acc_forest = round (forest.score (X_train, y_train) * 100, 2)
+    print("the train  score is :  " , acc_forest)
+    scores = cross_val_score (forest,X_train, y_train, cv = 10) 
+    print ("Scores:", scores) 
+    print ("Mean:", scores.mean ()) 
+    print ("Standard Deviation:", scores.std ())
+
+
+
+
+    #Decision Tree
+    from sklearn.tree import DecisionTreeClassifier
+
+    decisiontree = DecisionTreeClassifier()
+    decisiontree.fit(X_train, y_train)
+    y_predage = decisiontree.predict(X_test)
+    confusion_matrix (y_test, y_predage)
+    accuracy_score(y_test, forest_predictions)
+    acc_tree= round (decisiontree.score (X_train, y_train) * 100, 2)
+    print("l'accuracy of age_categories is : " , acc_tree)
+    scores = cross_val_score (decisiontree, X_train, y_train, cv = 7) 
+    print ("Scores:", scores) 
+    print ("La moyenne du score  est :", scores.mean ()) 
+    print ("l'ecart type du score est  :", scores.std ())
+
+
+
+    #SVM
+    from sklearn.svm import SVC
+
+    svc_lin=SVC(kernel='linear',random_state=0)
+    svc_lin.fit(X_train,y_train)
+
+    svm_predictions = svc_lin.predict (X_test)
+    print(classification_report(y_test,svm_predictions)) 
+    accuracy_score(y_test, svm_predictions)
+    confusion_matrix (y_test, svm_predictions)
+    acc_svc_lin = round (svc_lin.score (X_train, y_train) * 100, 2)
+    print("the train  score is :  " , acc_svc_lin)
+    scores = cross_val_score (svc_lin,X_train, y_train, cv = 10) 
+    print ("Scores:", scores) 
+    print ("La moyenne du score est :", scores.mean ()) 
+    print ("l'ecart type du score est :", scores.std ())
+
+    #♦KNN
+   from sklearn.neighbors import KNeighborsClassifier
+
+   knn = KNeighborsClassifier()
+   knn.fit(X_train, y_train)
+   knn_predictions = knn.predict (X_test)
+   accuracy_score(y_test, knn_predictions)
+   confusion_matrix (y_test, knn_predictions)
+   print(classification_report(y_test,knn_predictions)) 
+   
+   acc_knn = round (knn.score (X_train, y_train) * 100, 2)
+   print("the train  score is :  " , acc_knn)
+   
+   scores = cross_val_score (knn,X_train, y_train, cv = 10) 
+   print ("Scores:", scores) 
+   print ("La moyenne du score est :", scores.mean ()) 
+   print ("Lecart type du score est :", scores.std ())
+   
+   
+   #Using Logistic Regression Algorithm to the Training Set
+   from sklearn.linear_model import LogisticRegression
+   log = LogisticRegression(random_state = 0)
+   log.fit(X_train, y_train)
+   log_predictions = log.predict (X_test)
+   accuracy_score(y_test,log_predictions)
+   confusion_matrix (y_test, log_predictions)
+   print(classification_report(y_test,log_predictions)) 
+   
+   acc_log = round (log.score (X_train, y_train) * 100, 2)
+   print("the train  score is :  " , acc_log)
+   
+   scores = cross_val_score (log,X_train, y_train, cv = 10) 
+   print ("Scores:", scores) 
+   print ("La moyenne du score est :", scores.mean ()) 
+   print ("Lecart type du score est :", scores.std ())
+   
+   
+   
+   
+   #Using GaussianNB method of naïve_bayes class to use Naïve Bayes Algorithm
+   from sklearn.naive_bayes import GaussianNB
+   gauss = GaussianNB()
+   gauss.fit(X_train, y_train)
+   gauss_predictions = gauss.predict (X_test)
+   accuracy_score(y_test,gauss_predictions)
+   confusion_matrix (y_test, gauss_predictions)
+   print(classification_report(y_test,gauss_predictions)) 
+   
+   acc_gauss = round (gauss.score (X_train, y_train) * 100, 2)
+   print("the train  score is :  " , acc_gauss)
+   
+   scores = cross_val_score (gauss,X_train, y_train, cv = 10) 
+   print ("Scores:", scores) 
+   print ("La moyenne du score est :", scores.mean ()) 
+   print ("Lecart type du score est :", scores.std ())
+   
+   
+   
+   
+   
+#classement sur la meilleure méthode de prédiction:
+results = pd.DataFrame ({ 
+    'Model': ['SVM', 'KNN','Random Forest','DecisionTree','Log','Gauss'], 
+    'Score': [acc_svc_lin, acc_knn, 
+              acc_forest,acc_decisiontreeage,acc_log,acc_gauss]}) 
+results.sort_values(by='Score')
+
+
+my_survival = [[1,1,60,0, 0, 7, 0,1,2]]
+#Print Prediction of Random Forest Classifier model
+pred = forest.predict(my_survival)
+print(pred)
+
+if pred == 0:
+  print('Oh non! Tu ne surviras pas malheureusement! :( ')
+else:
+  print('OUIIIII! Tu surviras!! :D ')

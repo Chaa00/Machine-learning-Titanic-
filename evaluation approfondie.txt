@@ -1,0 +1,105 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jul 10 21:36:25 2020
+
+@author: HP-PC
+"""
+
+#Evaluation approfondie:
+
+##precision and recall 
+from sklearn.metrics import precision_score, recall_score
+
+print("Precision:", precision_score(y_train, forest_predictions))
+print("Recall:",recall_score(y_train, forest_predictions))
+
+
+
+
+
+
+from  sklearn.metrics  import precision_recall_curve 
+
+# obtention des probabilités de nos prédictions
+y_scores =forest.predict_proba (X_train) 
+y_scores = y_scores [:, 1]
+##ROC AUC
+from sklearn.metrics import roc_curve
+# compute true positive rate and false positive rate
+false_positive_rate, true_positive_rate, thresholds = roc_curve(y_train, y_scores)
+# plotting them against each other
+def plot_roc_curve(false_positive_rate, true_positive_rate, label=None):
+    plt.plot(false_positive_rate, true_positive_rate, linewidth=2, label=label)
+    plt.plot([0, 1], [0, 1], 'r', linewidth=4)
+    plt.axis([0, 1, 0, 1])
+    plt.xlabel('False Positive Rate (FPR)', fontsize=10)
+    plt.ylabel('True Positive Rate (TPR)', fontsize=10)
+
+plt.figure(figsize=(7, 3))
+plot_roc_curve(false_positive_rate, true_positive_rate)
+plt.show()
+
+#score ROC AUC
+from sklearn.metrics import roc_auc_score
+r_a_score = roc_auc_score(y_train, y_scores)
+print("ROC-AUC-Score:", r_a_score)
+
+
+
+
+
+
+
+
+
+
+#les étapes suivantes concernent la partie où je vais mettre le résultat 
+#de la survie prédit dans une nouvelle dataframe
+
+X_train = Data.drop("Survived", axis=1)
+y_train = Data["Survived"]
+X_test  = test.drop("PassengerId", axis=1).copy()
+
+
+# Random Forest de nouveau 
+
+random_forest = RandomForestClassifier(n_estimators=100, oob_score = True)
+random_forest.fit(X_train, y_train)
+Y_prediction = random_forest.predict(X_test)
+
+random_forest.score(X_train, y_train)
+
+acc_random_forest = round(random_forest.score(X_train, y_train) * 100, 2)
+print(round(acc_random_forest,2,), "%")
+
+
+  
+  
+#Create a CSV with results
+cha= pd.DataFrame({
+    "PassengerId": test["PassengerId"],
+    "Survived": Y_prediction   # le résultat trouvé de la survie en utilisant la méthode random_forest
+})
+print(cha.head(12))
+cha.to_csv(r"C:\Users\HP-PC\Desktop\cha.csv", index = False)
+
+
+
+
+#on teste si vous allez survivre ou non selon les choix de tes descripteurs
+# pclasse est 3 
+#sex est male 0 
+# age est 6 cad age entre 44 et 60
+#Sisbp choisi c 0 et Parch aussi 0
+#Fare choisi c 1
+#familysize donc c 1 
+#tile est 1 un Mr
+my_survival = [[1,1,6,0, 0, 1, 0,1,2]]
+#Print Prediction of Random Forest Classifier model
+pred = forest.predict(my_survival)
+print(pred)
+
+if pred == 0:
+  print('Oh non! Tu ne surviras pas malheureusement! :( ' )
+else:
+  print('OUIIIII! Tu surviras!! :D ')

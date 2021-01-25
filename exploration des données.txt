@@ -1,0 +1,289 @@
+# -*- coding: utf-8 -*-
+"""
+Éditeur de Spyder 
+@author: Chaa
+Ceci est un script temporaire.
+"""
+#☺import os
+#os.chdir(r"C:\Users\HP-PC\Desktop\ProjetTitanic")
+#loading modules:
+import pandas as pd
+import numpy as np
+import seaborn as sb 
+import matplotlib.pyplot as plt 
+
+#loading Data
+Data=pd.read_csv(r"C:\Users\HP-PC\Desktop\train.csv",sep=',')
+test=pd.read_csv(r"C:\Users\HP-PC\Desktop\test.csv",sep=',')
+print(Data)
+print(test)
+Data['Age']
+Data.head() #print les 5 premieres lignes du Data
+Data.shape #retourne le nombre des lignes et le nombre des colonnes 
+test.shape #retourne le nombre des lignes et le nombre des colonnes 
+print("le nombre des lignes est :" , Data.shape[0])
+print("le nombre des colonnes est :" , Data.shape[1])
+Data.describe(include='all') #retourne les differentes valeurs (means..)
+Data.info() #retourne des infos (types) de chaque variable 
+
+
+#how many people has survived?
+survived = Data[Data['Survived'] == 1]
+not_survived = Data[Data['Survived'] == 0]
+print ("Survived: %i (%.1f%%)"%(len(survived), float(len(survived))/len(Data)*100.0))
+print ("Not Survived: %i (%.1f%%)"%(len(not_survived), float(len(not_survived))/len(Data)*100.0))
+sb.countplot(x='Survived', data=Data)
+
+x1=float((len(survived))/len(Data)*100.0)
+y1=float((len(not_survived))/len(Data)*100.0)
+
+labels = ['Personnes Survivantes {:.2f} %'.format(x1) , 'Personnes non survivantes  {:.2f} %'.format(y1)]
+        
+sizes = [x1,y1]
+        
+colors = ['blue', 'red']
+        
+plt.figure(1)
+        
+patches, texts = plt.pie(sizes, colors=colors, startangle=90)        
+plt.legend(patches, labels, loc="best")
+        
+plt.title('Pourcentage de la survie des passagers')
+        
+plt.axis('equal')
+        
+plt.show()
+
+
+
+
+
+
+#numbers of male/female that survived:
+Data.Sex.value_counts() #retourne le nombre des hommes et femmes
+Data.groupby('Sex').Survived.value_counts() #retourne si le sex est en vie ou non ( 1 = survived , 0= not survived)
+
+print('Pourcentage des femmes qui ont survecu: ',float((Data[Data.Sex == 'female'].Survived.sum())/(Data[Data.Sex == 'female']
+      .Survived.count())*100.0),'%') #pourcentage des femmes qui ont survécu par rapport au nombre total des femmes 
+
+print('Pourcentage des hommes qui ont survecu: ',float((Data[Data.Sex == 'male'].Survived.sum())/(Data[Data.Sex == 'male']
+      .Survived.count())*100.0),'%')#pourcentage des hommes qui ont survécu par rapport au nombre total des hommes
+x=float((Data[Data.Sex == 'female'].Survived.sum())/(Data[Data.Sex == 'female']
+      .Survived.count())*100.0)
+y=float((Data[Data.Sex == 'male'].Survived.sum())/(Data[Data.Sex == 'male']
+      .Survived.count())*100.0)
+labels = ['femmes survivante {:.2f} %'.format(x) , 'hommes survivants  {:.2f} %'.format(y)]
+        
+sizes = [x,y]
+        
+colors = ['pink', 'yellow']
+        
+plt.figure(1)
+        
+patches, texts = plt.pie(sizes, colors=colors, startangle=90)        
+plt.legend(patches, labels, loc="best")
+        
+plt.title('Pourcentage de la survie des femmes&hommes')
+        
+plt.axis('equal')
+        
+plt.show()
+
+
+
+#Is Pclass a factor in survival ?
+Data.Pclass.value_counts()
+w=Data.groupby('Pclass').Survived.value_counts() 
+print(w)
+
+#pclass= Data.pivot_table(index="Pclass",values="Survived")  #pour pivoter la dataframe on utilise "Pclass" pour l indice du parametre et "Survived" pour le parametre.
+print('Pourcentage des personnes de la classe 1 qui ont survecu: ',float((Data[Data.Pclass == 1].Survived.sum())/(Data[Data.Pclass == 1]
+      .Survived.count())*100.0),'%')
+
+print('Pourcentage des personnes de la classe 2 qui ont survecu: ',float((Data[Data.Pclass == 2].Survived.sum())/(Data[Data.Pclass== 2]
+      .Survived.count())*100.0),'%')
+print('Pourcentage des personnes de la classe 3 qui ont survecu: ',float((Data[Data.Pclass == 3].Survived.sum())/(Data[Data.Pclass == 3]
+      .Survived.count())*100.0),'%')
+
+ax1=float((Data[Data.Pclass == 1].Survived.sum())/(Data[Data.Pclass == 1]
+      .Survived.count())*100.0)
+
+ax2=float((Data[Data.Pclass == 2].Survived.sum())/(Data[Data.Pclass== 2]
+      .Survived.count())*100.0)
+ax3=float((Data[Data.Pclass == 3].Survived.sum())/(Data[Data.Pclass == 3]
+      .Survived.count())*100.0)
+
+
+
+
+labels = ['Les survivants de la classe1:  {:.2f} %'.format(ax1) , 
+          'Les survivants de la classe2: {:.2f} %'.format(ax2),
+          'Les survivants de la classe3:  {:.2f} % '.format(ax3)]
+        
+sizes = [ax1,ax2,ax3]
+        
+colors = ['green', 'red','blue']
+        
+plt.figure(1)
+        
+patches, texts = plt.pie(sizes, colors=colors, startangle=90)        
+plt.legend(patches, labels, loc="best")
+        
+plt.title('Pourcentage des survivants de chaque classe')
+        
+plt.axis('equal')
+        
+plt.show()
+
+
+
+
+
+#relation between pclass and sex:
+tab = pd.crosstab(Data['Pclass'], Data['Sex'])
+print (tab)
+
+#relation between sex, pclass and survived: 
+sb.barplot('Sex', 'Survived', hue='Pclass',palette="rocket",data=Data)
+
+
+
+def bar_chart(feature):
+    survived = Data[Data['Survived']==1][feature].value_counts()
+    dead = Data[Data['Survived']==0][feature].value_counts()
+    df = pd.DataFrame([survived,dead])
+    df.index = ['Survived','Dead'] 
+    df.plot(kind='bar',stacked=True, figsize=(7,3))
+
+
+#Is Embarked a factor in survival? 
+Data.Embarked.value_counts()
+Data.groupby('Embarked').Survived.value_counts()
+bar_chart('Embarked')
+
+#relation between Pcalss,sex,Embarked and survival:
+
+colors1=['pink','blue','red','green']
+sb.barplot(x='Pclass', y='Survived', hue='Embarked',palette=colors, data=Data)
+
+colors2=['grey','pink','blue']
+sb.barplot(x='Sex', y='Survived', hue='Embarked',palette=colors2, data=Data)
+
+#Is parch a factor in survival ?
+
+
+Data.Parch.value_counts()
+Data.groupby('Parch').Survived.value_counts()
+bar_chart('Parch')
+
+#Is Sib a factor in survival?
+Data.SibSp.value_counts()
+Data.groupby('SibSp').Survived.value_counts()
+bar_chart('SibSp')
+
+#sb.barplot(x='SibSp', y='Survived', palette="rocket",ci=None, data=Data)
+#Is age a factor in survival ?
+Data.Age.value_counts()
+Data.groupby('Age').Survived.value_counts()
+colors=['orange','blue','red','green']
+
+sb.barplot(x='Age', y='Survived' ,palette=colors, data=Data)
+
+#la relation n'est pas claire! La cause: on a des données manquants! 
+#how to deal with missing data? 
+#1ere méthode pour le traitement des données manquantes de l'age: ( suppression des données incomplètes)
+Data_drop= Data.dropna()
+sb.distplot(Data_drop.Age, kde=False)
+
+#2ème méthode ( la séparation des données )
+
+#->on separe ces données en categories. Comment?
+#en les mettant dans des intevalles et en utilisant la fonctions pandas.cut()
+#on arrive donc à creer des tranches d'age
+
+def age(aux,cut_points,label_names):  
+    
+    aux["Age"] = aux["Age"].fillna(-0.5) #remplir les valeurs manquantes 
+    aux["Age_categories"] = pd.cut(aux["Age"],cut_points,labels=label_names) #convertir valeurs en categories 
+    #The pandas.cut() function has two required parameters: the column we wish to cut and a list of numbers which define the boundaries of our cuts
+    return aux
+
+#Creer deux listes  cut_points et label_names  pour diviser  la colonne age en six categories:
+cut_points = [-1,0, 5, 12, 18, 35, 60, 100] #par exemple missing prend les valeur entre -1 et 0 etc..
+label_names = ["Missing", 'Infant', "Child", 'Teenager', "Young Adult", 'Adult', 'Senior']
+
+Data = age(Data,cut_points,label_names) #atribuer le resultat à Data en appliquant la fonction age 
+
+age_cat_pivot = Data.pivot_table(index="Age_categories",values="Survived")
+#Utiliser DataFrame.pivot_table() pour pivoter  Data dataframe par la colonne Age_categories.
+age_cat_pivot.plot.bar()
+plt.show()
+
+#relation between Sex and Age ( new age calculated )
+total_survived = Data[Data['Survived']==1]
+total_not_survived = Data[Data['Survived']==0]
+male_survived = Data[(Data['Survived']==1) & (Data['Sex']=="male")]
+female_survived = Data[(Data['Survived']==1) & (Data['Sex']=="female")]
+male_not_survived = Data[(Data['Survived']==0) & (Data['Sex']=="male")]
+female_not_survived = Data[(Data['Survived']==0) & (Data['Sex']=="female")]
+
+plt.figure(figsize=[15,5])
+plt.subplot(121)
+sb.distplot(female_survived['Age'].dropna().values, bins=range(0, 81, 1), kde=False, color='blue',axlabel='Female survived Age')
+sb.distplot(female_not_survived['Age'].dropna().values, bins=range(0, 81, 1), kde=False, color='red', axlabel='Female not survived  Age')
+
+
+plt.figure(figsize=[15,5])
+plt.subplot(121)
+sb.distplot(male_survived['Age'].dropna().values, bins=range(0, 81, 1), kde=False, color='blue',axlabel='Male survived Age')
+sb.distplot(male_not_survived['Age'].dropna().values, bins=range(0, 81, 1), kde=False, color='red', axlabel='Male not survived Age')
+
+
+#femmes ayant l'age entre  "18 et 40" et plus que 50  ont plus de chance de survivre .
+#hommes ayant l 'age entre 0 et 14 ont plus de chance 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+  
+
+
+
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
